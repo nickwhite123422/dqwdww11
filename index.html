@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Chat</title>
+    <style>
+        body { font-family: Arial; margin: 2rem; }
+        #chat { border: 1px solid #ccc; padding: 1rem; height: 400px; overflow-y: scroll; }
+        .user { color: blue; }
+        .ai { color: green; }
+    </style>
+</head>
+<body>
+    <h2>AI Chat (Text + Audio)</h2>
+    <div id="chat"></div>
+    <input id="input" type="text" placeholder="Type here..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const backendUrl = "https://your-app.up.railway.app"; // replace with Railway URL
+
+        async function sendMessage() {
+            const input = document.getElementById("input");
+            const chatDiv = document.getElementById("chat");
+            const userText = input.value;
+            if(!userText) return;
+
+            chatDiv.innerHTML += `<p class="user">You: ${userText}</p>`;
+            input.value = "";
+
+            // Send text to backend
+            const res = await fetch(`${backendUrl}/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: userText })
+            });
+            const data = await res.json();
+            const aiText = data.reply;
+            chatDiv.innerHTML += `<p class="ai">AI: ${aiText}</p>`;
+
+            // Optional: text-to-speech
+            const audioRes = await fetch(`${backendUrl}/tts`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: aiText })
+            });
+            const audioData = await audioRes.json();
+            const audio = new Audio(`${backendUrl}/response.mp3`);
+            audio.play();
+
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>
