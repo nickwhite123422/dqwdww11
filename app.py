@@ -2,7 +2,9 @@ from flask import Flask, request, jsonify
 import openai, os
 
 app = Flask(__name__)
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv("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
+
+")
 
 # --- Text chat endpoint ---
 @app.route("/chat", methods=["POST"])
