@@ -1,12 +1,10 @@
 from flask import Flask, request, jsonify
 import openai, os
-from pathlib import Path
 
 app = Flask(__name__)
-openai.api_key = os.getenv("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
-")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Endpoint for text chat
+# --- Text chat endpoint ---
 @app.route("/chat", methods=["POST"])
 def chat():
     user_text = request.json.get("text", "")
@@ -20,7 +18,7 @@ def chat():
     answer = response.choices[0].message.content
     return jsonify({"reply": answer})
 
-# Endpoint for TTS (optional)
+# --- Optional: TTS endpoint ---
 @app.route("/tts", methods=["POST"])
 def tts():
     text = request.json.get("text", "")
@@ -32,10 +30,11 @@ def tts():
         voice="alloy",
         input=text
     )
-    audio_file = Path("response.mp3")
-    with open(audio_file, "wb") as f:
+    with open("response.mp3", "wb") as f:
         f.write(audio_resp.read())
     return jsonify({"message": "Audio generated", "file": "response.mp3"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
